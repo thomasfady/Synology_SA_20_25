@@ -1,4 +1,4 @@
-# Synology_SA_20_25 : SafeAccess - Multiple Vulnerabilities
+# Synology-SA-20:25 : SafeAccess - Multiple Vulnerabilities
 
 Safe Access Version : 1.2.1-0220
 
@@ -6,9 +6,19 @@ SRM Version : 1.2.3-8017 Update 4
 
 Bug Hunter : Thomas FADY
 
-CVE :
+CVE:
 - [CVE-2020-27659](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2020-27659)
 - [CVE-2020-27660](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2020-27660)
+
+Advisory:
+
+- [Synology-SA-20:25](https://www.synology.com/fr-fr/security/advisory/Synology_SA_20_25)
+
+## Timeline
+
+- 01/05/2020: Vendor Disclosure
+- 24/11/2020: Initial public release.
+- 30/11/2020: Disclosed vulnerability details.
 
 ## Summary
 
