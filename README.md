@@ -22,15 +22,15 @@ Advisory:
 
 ## Summary
 
-The first vulnerability describe in the report is a Stored XSS exploiting multiple output pages. If an attacker exploits this vulnerably, the session of the admin user can be used to execute an action on the router like changing the admin password and activating the SSH service to take control of the router.
+The first vulnerability described in the report is a Stored XSS exploiting multiple output pages. If an attacker exploits this vulnerably, the session of the admin user can be used to execute an action on the router like changing the admin password and activating the SSH service to take control of the router.
 
-The second vulnerability is an SQLite Injection leading to arbitrary SQLite editing on the system. An attacker can for example modify the fbsharing.db database to expose internals directories and download all files accessible through the File Station.
+The second vulnerability is an SQLite Injection leading to arbitrary SQLite editing on the system. An attacker can for example modify the fbsharing.db database to expose internals directories and download all accessible files through the File Station.
 
 ## Multiple Stored XSS
 
 ### Explanation
 
-The XSS occurs when a user sends a request to access a website blocked by SafeAccess. The domain is reflected on the activity log and reports of SafeAccess. If the admin user goes on one of these vulnerable pages, the attacker can use JavaScript to use SRM API and modify the administrator password. Then, the attacker can enable SSH and get remote access to the router as root.
+The XSS occurs when a user sends a request to access a website blocked by SafeAccess. The domain is reflected on the activity log and reports of SafeAccess. If the admin user visits one of these vulnerable pages, the attacker can use JavaScript to use SRM API and modify the administrator password. Then, the attacker can enable SSH and get remote access to the router as root.
 
 The exploit requires:
 
@@ -156,7 +156,7 @@ The XSS is also present on activity reports.
 
 ![image-20200501174321029](image-20200501174321029.png)
 
-If the administrator access the report, the XSS will be triggered
+If the administrator accesses the report, the XSS will be triggered
 
 ![image-20200501174356242](image-20200501174356242.png)
 
@@ -185,16 +185,16 @@ document.body.appendChild(i);
 
 To fix this vulnerability, I advise addressing two points:
 
-- Fix the XSS by encoding output during the activity log rendering
-- Ask the old password to modify the administrator account
+- Fix the XSS by encoding the output during the activity log rendering
+- Require the old password to modify the administrator account
 
 ## SQLite Injection
 
 ### Explanation
 
-The same endpoint as the XSS one is vulnerable to SQLite Injection. I identify a way to get access to shared folders file by using this injection. I'm searching for a way to upload a file to be able to trigger my old reported vulnerability: **Unauthenticated RCE with root privileges in DSM and SRM**". This vulnerability is not fixed on SRM and requires only to be able to write on the disk. 
+The same endpoint is vulnerable to SQLite Injection. I identified a way  to get access to the shared folders file using this injection. I'm looking for a way to upload a file to be able to trigger my old reported vulnerability: **Unauthenticated RCE with root privileges in DSM and SRM**". This vulnerability is not fixed on SRM and requires only to be able to write on the disk. 
 
-On DSM, the sharing feature allows defining an upload folder but I didn't find this on SRM.
+On DSM, the sharing feature allows to define an upload folder but I couldn't find it on SRM.
 
 ### Exploitation
 
