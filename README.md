@@ -1,10 +1,10 @@
-# Synology-SA-20:25 : SafeAccess - Multiple Vulnerabilities
+# Synology-SA-20:25: SafeAccess - Multiple Vulnerabilities
 
-Safe Access Version : 1.2.1-0220
+Safe Access Version: 1.2.1-0220
 
 SRM Version : 1.2.3-8017 Update 4
 
-Bug Hunter : Thomas FADY
+Bug Hunter: Thomas FADY
 
 CVE:
 - [CVE-2020-27659](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2020-27659)
@@ -22,15 +22,15 @@ Advisory:
 
 ## Summary
 
-The first vulnerability describe in the report is a Stored XSS exploiting multiple output pages. If an attacker exploit this vulnerably, the session of the admin user can be used to execute action on the router like change the admin password and activate the SSH service to take control of the router.
+The first vulnerability describe in the report is a Stored XSS exploiting multiple output pages. If an attacker exploits this vulnerably, the session of the admin user can be used to execute an action on the router like changing the admin password and activating the SSH service to take control of the router.
 
-The second vulnerability is an SQLite Injection leading to arbitrary SQLite editing on the system. An attacker can for example modify the fbsharing.db database to expose internal directory and download all file accessible through the File Station.
+The second vulnerability is an SQLite Injection leading to arbitrary SQLite editing on the system. An attacker can for example modify the fbsharing.db database to expose internals directories and download all files accessible through the File Station.
 
 ## Multiple Stored XSS
 
 ### Explanation
 
-The XSS occur when a user sends a request to access a website blocked by SafeAccess. The domain is reflected on the activity log and reports of SafeAccess. If the admin user go on one of these vulnerable page, the attacker can use JavaScript to use SRM API and modify the administrator password. Then, the attacker can enable SSH and get remote access to the router as root.
+The XSS occurs when a user sends a request to access a website blocked by SafeAccess. The domain is reflected on the activity log and reports of SafeAccess. If the admin user goes on one of these vulnerable pages, the attacker can use JavaScript to use SRM API and modify the administrator password. Then, the attacker can enable SSH and get remote access to the router as root.
 
 The exploit requires:
 
@@ -46,7 +46,7 @@ First, to test the normal behavior, we send a request to ask the administrator t
 
 ![image-20200501163909763](image-20200501163909763.png)
 
-The domain doesn't need to be in the block list but a profile need to be configured on SafeAccess.
+The domain doesn't need to be in the block list but a profile needs to be configured on SafeAccess.
 
 We can see the request in the activity log 
 
@@ -56,7 +56,7 @@ To confirm the XSS, we can use a simple payload to print an alert on the web pag
 
 ![image-20200501164246877](image-20200501164246877.png)
 
-The content is loaded on the page dynamically, so we use an event based XSS.
+The content is loaded on the page dynamically, so we use an event-based XSS.
 
 ```html
 <img src=x onerror=alert("XSS")>
@@ -185,16 +185,16 @@ document.body.appendChild(i);
 
 To fix this vulnerability, I advise addressing two points:
 
-- Fix the XSS by encode output during the activity log rendering
+- Fix the XSS by encoding output during the activity log rendering
 - Ask the old password to modify the administrator account
 
 ## SQLite Injection
 
 ### Explanation
 
-The same endpoint as the XSS one is vulnerable to an SQLite Injection. I identify a way to get access to shared folders file by using this injection. I'm searching a way to upload file to be able to trigger my old reported vulnerability : **Unauthenticated RCE with root privileges in DSM and SRM**" . This vulnerability is not fixed on SRM and require only to be able to write on the disk. 
+The same endpoint as the XSS one is vulnerable to SQLite Injection. I identify a way to get access to shared folders file by using this injection. I'm searching for a way to upload a file to be able to trigger my old reported vulnerability: **Unauthenticated RCE with root privileges in DSM and SRM**". This vulnerability is not fixed on SRM and requires only to be able to write on the disk. 
 
-On DSM, the sharing feature allow to define an upload folder but I didn't found this on SRM.
+On DSM, the sharing feature allows defining an upload folder but I didn't find this on SRM.
 
 ### Exploitation
 
@@ -202,15 +202,15 @@ The domain parameter is not properly handled to protect against SQLite injection
 
 ![image-20200501181500003](image-20200501181500003.png)
 
-We can see on the activity log interface that the router uses the version 3.27 of SQLite.
+We can see on the activity log interface that the router uses version 3.27 of SQLite.
 
 ![image-20200501181848469](image-20200501181848469.png)
 
-SQLite allows to attach a database to modify it directly. I choose the database "**fbsharing.db**" containing sharing folders information.
+SQLite allows attaching a database to modify it directly. I choose the database "**fbsharing.db**" containing sharing folders information.
 
-By default, this file does not exist. To create it , we need to share at least one thing.
+By default, this file does not exist. To create it, we need to share at least one thing.
 
-A USB device need to be plugged on the router to be able to use the File Station.
+A USB device needs to be plugged into the router to be able to use the File Station.
 
 To demonstrate the exploitation, we can create two folders:
 
@@ -238,16 +238,16 @@ The shared folder is correctly added:
 
 ![image-20200501184013023](image-20200501184013023.png)
 
-Now, we can access to the new shared folder:
+Now, we can access the new shared folder:
 
 http://192.168.1.1:8000/fbdownload/exploits?k=exploits&stdhtml=true
 
 ![image-20200501184042710](image-20200501184042710.png)
 
-And we can access to the "**Super Secret Files**"
+And we can access the "**Super Secret Files**"
 
 ![image-20200501184113253](image-20200501184113253.png)
 
 ### Remediation
 
-To fix this vulnerability, we need to use prepared statement to execute SQLite queries properly.
+To fix this vulnerability, we need to use a prepared statement to execute SQLite queries properly.
